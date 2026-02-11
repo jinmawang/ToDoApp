@@ -4,6 +4,12 @@ set -e
 DOMAIN="tianma.chat"
 EMAIL="your-email@example.com"  # 修改为你的邮箱
 
+# 检查邮箱是否已修改
+if [ "$EMAIL" = "your-email@example.com" ]; then
+    echo "错误: 请先修改 EMAIL 变量为你的真实邮箱地址"
+    exit 1
+fi
+
 echo "=== SSL 证书配置脚本 ==="
 
 # 检查是否为 root
@@ -18,16 +24,23 @@ systemctl stop nginx || true
 # 申请证书
 echo ">>> 申请 Let's Encrypt SSL 证书..."
 certbot certonly --standalone \
-    -d $DOMAIN \
-    -d www.$DOMAIN \
-    -d api.$DOMAIN \
-    --email $EMAIL \
+    -d "$DOMAIN" \
+    -d www."$DOMAIN" \
+    -d api."$DOMAIN" \
+    --email "$EMAIL" \
     --agree-tos \
     --no-eff-email \
     --force-renewal
 
 # 复制 SSL 参数配置
 echo ">>> 配置 SSL 参数..."
+
+# 检查文件是否存在
+if [ ! -f "/opt/tianma/nginx/ssl-params.conf" ]; then
+    echo "错误: 找不到 /opt/tianma/nginx/ssl-params.conf"
+    exit 1
+fi
+
 cp /opt/tianma/nginx/ssl-params.conf /etc/nginx/snippets/
 
 # 生成 DH 参数（这可能需要几分钟）

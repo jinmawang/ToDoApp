@@ -15,7 +15,7 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 # 进入项目目录
-cd $PROJECT_DIR
+cd "$PROJECT_DIR"
 
 # 拉取最新代码
 echo ">>> 拉取最新代码..."
@@ -29,17 +29,24 @@ npm run build
 
 # 部署前端文件
 echo ">>> 部署前端文件..."
-rm -rf $FRONTEND_DIR/*
-cp -r dist/* $FRONTEND_DIR/
-chown -R www-data:www-data $FRONTEND_DIR
+
+# 安全检查
+if [ -z "$FRONTEND_DIR" ] || [ "$FRONTEND_DIR" = "/" ]; then
+    echo "错误: FRONTEND_DIR 未设置或无效"
+    exit 1
+fi
+
+rm -rf "$FRONTEND_DIR"/*
+cp -r dist/* "$FRONTEND_DIR"/
+chown -R www-data:www-data "$FRONTEND_DIR"
 
 # 返回项目根目录
-cd $PROJECT_DIR
+cd "$PROJECT_DIR"
 
 # 更新 Nginx 配置
 echo ">>> 更新 Nginx 配置..."
-cp nginx/tianma.chat.conf $NGINX_CONF
-ln -sf $NGINX_CONF /etc/nginx/sites-enabled/
+cp nginx/tianma.chat.conf "$NGINX_CONF"
+ln -sf "$NGINX_CONF" /etc/nginx/sites-enabled/
 
 # 测试 Nginx 配置
 nginx -t
