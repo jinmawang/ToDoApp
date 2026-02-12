@@ -12,6 +12,21 @@ export interface SubTask {
   createdAt: string
 }
 
+// 创建子任务时只需要 title
+export interface CreateSubTaskInput {
+  title: string
+}
+
+// 创建 Todo 时的输入类型
+export interface CreateTodoInput {
+  title: string
+  description?: string
+  priority?: 'low' | 'medium' | 'high'
+  dueDate?: string | null
+  categoryId?: number | null
+  subtasks?: CreateSubTaskInput[]
+}
+
 export interface Category {
   id: number
   name: string
@@ -132,7 +147,7 @@ export const useTodoStore = defineStore('todo', () => {
     }
   }
 
-  async function addTodo(todoData: Partial<Todo>) {
+  async function addTodo(todoData: CreateTodoInput) {
     try {
       const response = await axios.post(API_URL, todoData)
       todos.value.unshift(response.data)
