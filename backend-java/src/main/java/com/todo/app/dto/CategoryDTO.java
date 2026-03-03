@@ -19,7 +19,7 @@ public class CategoryCreateDTO {
     public void setIcon(String icon) { this.icon = icon; }
 }
 
-class CategoryUpdateDTO {
+public class CategoryUpdateDTO {
 
     private String name;
 
