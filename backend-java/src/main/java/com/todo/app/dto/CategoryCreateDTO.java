@@ -18,19 +18,3 @@ public class CategoryCreateDTO {
     public String getIcon() { return icon; }
     public void setIcon(String icon) { this.icon = icon; }
 }
-
-public class CategoryUpdateDTO {
-
-    private String name;
-
-    private String color;
-
-    private String icon;
-
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
-    public String getColor() { return color; }
-    public void setColor(String color) { this.color = color; }
-    public String getIcon() { return icon; }
-    public void setIcon(String icon) { this.icon = icon; }
-}
