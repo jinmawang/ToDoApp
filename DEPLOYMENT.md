@@ -82,6 +82,7 @@
 ### 2.1 本地环境要求
 
 ```bash
+# ---------- 在本地电脑执行 ----------
 # 检查 Node.js（用于前端构建）
 node -v  # 需要 v18+
 
@@ -132,6 +133,7 @@ git -v
 ### 3.1 连接服务器
 
 ```bash
+# ---------- 在本地电脑执行 ----------
 # 从本地电脑连接服务器
 ssh ubuntu@111.231.24.51
 
@@ -145,6 +147,7 @@ ssh ubuntu@111.231.24.51
 > **Docker 是什么？** 一种容器技术，可以把应用和它的依赖打包在一起，确保在任何环境都能一致运行。就像"集装箱"，把货物（应用）装进去，运到哪里都能用。
 
 ```bash
+# ---------- 在服务器上执行（通过 SSH 连接后） ----------
 # 更新软件包列表
 sudo apt update
 
@@ -181,6 +184,7 @@ docker compose version
 > 3. 处理 HTTPS 加密
 
 ```bash
+# ---------- 在服务器上执行 ----------
 # 安装 Nginx
 sudo apt install -y nginx
 
@@ -196,6 +200,7 @@ curl http://localhost
 ### 3.4 创建项目目录
 
 ```bash
+# ---------- 在服务器上执行 ----------
 # 创建项目目录
 sudo mkdir -p /home/ubuntu/tianma/ToDoApp
 sudo chown -R ubuntu:ubuntu /home/ubuntu/tianma
@@ -511,7 +516,7 @@ jar tf app.jar
 ### 5.4 创建环境变量文件
 
 ```bash
-# 在服务器上创建 .env 文件
+# ---------- 在服务器上执行 ----------
 cd /home/ubuntu/tianma/ToDoApp/docker
 
 cat > .env << 'EOF'
@@ -531,6 +536,7 @@ chmod 600 .env
 ### 5.5 构建并启动后端
 
 ```bash
+# ---------- 在服务器上执行 ----------
 cd /home/ubuntu/tianma/ToDoApp/docker
 
 # 构建镜像（首次需要下载依赖，较慢）
@@ -549,6 +555,7 @@ sudo docker compose logs -f backend
 ### 5.6 验证后端运行
 
 ```bash
+# ---------- 在服务器上执行 ----------
 # 检查健康状态
 curl http://127.0.0.1:3002/actuator/health
 # 应该返回：{"status":"UP"}
@@ -573,7 +580,7 @@ curl http://127.0.0.1:3002/api/auth/register \
 ### 6.2 本地构建前端
 
 ```bash
-# 在本地电脑执行
+# ---------- 在本地电脑执行 ----------
 cd ~/Documents/hhCode/nestjs/frontend
 
 # 安装依赖
@@ -595,22 +602,23 @@ ls dist/
 ### 6.3 上传构建产物到服务器
 
 ```bash
-# 在本地执行
+# ---------- 在本地电脑执行 ----------
 scp -r dist/* ubuntu@111.231.24.51:/var/www/html/
 
 # 或者先打包再上传
 tar -czf dist.tar.gz dist/
 scp dist.tar.gz ubuntu@111.231.24.51:/tmp/
+```
 
-# 在服务器上解压
-ssh ubuntu@111.231.24.51
+```bash
+# ---------- 在服务器上执行 ----------
 sudo tar -xzf /tmp/dist.tar.gz -C /var/www/html/ --strip-components=1
 ```
 
 ### 6.4 设置文件权限
 
 ```bash
-# 在服务器上执行
+# ---------- 在服务器上执行 ----------
 sudo chown -R www-data:www-data /var/www/html/
 sudo chmod -R 755 /var/www/html/
 ```
@@ -639,6 +647,7 @@ sudo chmod -R 755 /var/www/html/
 ### 7.2 创建站点配置
 
 ```bash
+# ---------- 在服务器上执行 ----------
 sudo nano /etc/nginx/sites-available/tianma.chat
 ```
 
@@ -711,6 +720,7 @@ server {
 ### 7.3 启用站点配置
 
 ```bash
+# ---------- 在服务器上执行 ----------
 # 创建符号链接启用站点
 sudo ln -s /etc/nginx/sites-available/tianma.chat /etc/nginx/sites-enabled/
 
@@ -812,14 +822,18 @@ sudo systemctl reload nginx
 6. 上传到服务器：
 
 ```bash
+# ---------- 在本地电脑执行 ----------
+# 上传证书到服务器
+scp tianma.chat.pem ubuntu@111.231.24.51:/tmp/
+scp tianma.chat.key ubuntu@111.231.24.51:/tmp/
+```
+
+```bash
+# ---------- 在服务器上执行 ----------
 # 创建 SSL 目录
 sudo mkdir -p /etc/nginx/ssl
 
-# 上传证书（在本地执行）
-scp tianma.chat.pem ubuntu@111.231.24.51:/tmp/
-scp tianma.chat.key ubuntu@111.231.24.51:/tmp/
-
-# 移动到正确位置（在服务器执行）
+# 移动证书到正确位置
 sudo mv /tmp/tianma.chat.pem /etc/nginx/ssl/
 sudo mv /tmp/tianma.chat.key /etc/nginx/ssl/
 
@@ -830,6 +844,7 @@ sudo chmod 600 /etc/nginx/ssl/*
 ### 8.3 方法二：Let's Encrypt 免费证书
 
 ```bash
+# ---------- 在服务器上执行 ----------
 # 安装 Certbot
 sudo apt install -y certbot python3-certbot-nginx
 
@@ -849,6 +864,7 @@ sudo certbot renew --dry-run
 ### 9.1 连接数据库
 
 ```bash
+# ---------- 在服务器上执行 ----------
 # 方法一：通过 Docker 进入 MySQL 容器
 sudo docker exec -it tianma-mysql mysql -u root -p
 # 输入密码（.env 中的 MYSQL_ROOT_PASSWORD）
@@ -893,6 +909,7 @@ WHERE t.user_id = 1;
 ### 9.3 数据备份与恢复
 
 ```bash
+# ---------- 在服务器上执行 ----------
 # 备份整个数据库
 sudo docker exec tianma-mysql mysqldump -u root -p'你的密码' todo_db > backup_$(date +%Y%m%d).sql
 
@@ -926,6 +943,7 @@ volumes:
 ### 10.1 服务管理
 
 ```bash
+# ---------- 在服务器上执行 ----------
 # === Docker 服务 ===
 # 查看运行中的容器
 sudo docker compose ps
@@ -956,6 +974,7 @@ sudo systemctl restart nginx
 ### 10.2 日志查看
 
 ```bash
+# ---------- 在服务器上执行 ----------
 # 后端日志
 sudo docker compose logs -f backend         # 实时跟踪
 sudo docker compose logs --tail=100 backend # 最后100行
@@ -971,25 +990,30 @@ sudo journalctl -u nginx -f
 ### 10.3 代码更新流程
 
 ```bash
+# ---------- 第 1-2 步：在本地电脑执行 ----------
 # 1. 本地修改代码并测试
 
 # 2. 推送到 GitHub
 git add .
 git commit -m "fix: 修复xxx问题"
 git push
+```
 
+```bash
+# ---------- 第 3-4 步：在服务器上执行 ----------
 # 3. 服务器拉取代码
-ssh ubuntu@111.231.24.51
 cd /home/ubuntu/tianma/ToDoApp
 git pull
 
 # 4. 重新构建后端
 cd docker
 sudo docker compose up -d --build backend
+```
 
+```bash
+# ---------- 第 5 步：在本地电脑执行 ----------
 # 5. 更新前端（本地构建后上传）
-# 本地执行：
-cd frontend
+cd ~/Documents/hhCode/nestjs/frontend
 npm run build
 scp -r dist/* ubuntu@111.231.24.51:/var/www/html/
 ```
@@ -997,6 +1021,7 @@ scp -r dist/* ubuntu@111.231.24.51:/var/www/html/
 ### 10.4 资源监控
 
 ```bash
+# ---------- 在服务器上执行 ----------
 # 查看服务器资源使用
 htop                    # 交互式进程查看
 df -h                   # 磁盘使用情况
@@ -1017,6 +1042,7 @@ docker system prune -a  # 清理所有无用镜像、容器、网络
 ### 11.1 后端无法启动
 
 ```bash
+# ---------- 在服务器上执行 ----------
 # 查看日志
 sudo docker compose logs backend
 
@@ -1034,6 +1060,7 @@ free -h
 ### 11.2 前端白屏
 
 ```bash
+# ---------- 在服务器上执行 ----------
 # 1. 检查文件是否存在
 ls -la /var/www/html/
 
@@ -1049,6 +1076,7 @@ sudo nginx -t
 ### 11.3 API 404 错误
 
 ```bash
+# ---------- 在服务器上执行 ----------
 # 1. 确认后端运行中
 curl http://127.0.0.1:3002/actuator/health
 
@@ -1076,6 +1104,7 @@ location / {
 ### 11.5 数据库连接拒绝
 
 ```bash
+# ---------- 在服务器上执行 ----------
 # 1. 检查 MySQL 容器状态
 sudo docker compose ps mysql
 
@@ -1091,17 +1120,16 @@ sudo docker exec tianma-mysql mysql -u root -p'密码' -e "SELECT 1"
 ## 附录：快速命令参考
 
 ```bash
+# ---------- 在服务器上执行 ----------
+
 # === 一键部署（首次） ===
 cd /home/ubuntu/tianma/ToDoApp/docker
 sudo docker compose up -d
 
 # === 更新后端 ===
+cd /home/ubuntu/tianma/ToDoApp
 git pull
 cd docker && sudo docker compose up -d --build backend
-
-# === 更新前端 ===
-# 本地：npm run build
-# 上传：scp -r dist/* ubuntu@111.231.24.51:/var/www/html/
 
 # === 查看状态 ===
 sudo docker compose ps
@@ -1113,6 +1141,15 @@ sudo systemctl reload nginx
 
 # === 数据库操作 ===
 sudo docker exec -it tianma-mysql mysql -u root -p
+```
+
+```bash
+# ---------- 在本地电脑执行 ----------
+
+# === 更新前端 ===
+cd ~/Documents/hhCode/nestjs/frontend
+npm run build
+scp -r dist/* ubuntu@111.231.24.51:/var/www/html/
 ```
 
 ---
