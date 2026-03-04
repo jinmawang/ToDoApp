@@ -25,7 +25,7 @@ public class JwtUtil {
 
     public String generateToken(Long userId, String email, String username) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("sub", userId);
+        claims.put("sub", String.valueOf(userId));
         claims.put("email", email);
         claims.put("username", username);
 
@@ -55,7 +55,8 @@ public class JwtUtil {
     public Long getUserIdFromToken(String token) {
         Claims claims = parseToken(token);
         if (claims != null) {
-            return claims.get("sub", Long.class);
+            String sub = claims.get("sub", String.class);
+            return sub != null ? Long.parseLong(sub) : null;
         }
         return null;
     }
